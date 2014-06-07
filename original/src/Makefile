@@ -1,6 +1,6 @@
 # Hey Emacs, this is a -*- makefile -*-
 #----------------------------------------------------------------------------
-# WinAVR Makefile Template written by Eric B. Weddington, Jörg Wunsch, et al.
+# WinAVR Makefile Template written by Eric B. Weddington, JÃ¶rg Wunsch, et al.
 #
 # Released to the Public Domain
 #
@@ -45,11 +45,12 @@
 
 
 # MCU name
-MCU = attiny13
+MCU = atmega328p
 
 # Fuse values
-L_FUSE = 0x7A
-H_FUSE = 0xFB
+L_FUSE = 0xE2
+H_FUSE = 0xD9
+E_FUSE = 0xFF
 
 
 # Processor frequency.
@@ -70,7 +71,7 @@ H_FUSE = 0xFB
 #         F_CPU = 16000000
 #         F_CPU = 18432000
 #         F_CPU = 20000000
-F_CPU = 9600000
+F_CPU = 8000000
 
 
 # Output format. (can be srec, ihex, binary)
@@ -78,7 +79,7 @@ FORMAT = ihex
 
 
 # Target file name (without extension).
-TARGET = blinky
+TARGET = bikeswitch
 
 
 # Object files directory
@@ -88,7 +89,7 @@ OBJDIR = .
 
 
 # Shared source code
-SHARED = ../../libs
+SHARED = 
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -98,7 +99,7 @@ SRC = $(TARGET).c
 # List library files here
 #PRINTF_LIB_MIN = -Wl,-u,vfprintf -lprintf_min
 #LIBS = -Wl,-u,utils -lutils
-#LIBS = -lsyn	# Synapseware library :)
+#LIBS = -lsyn   # Synapseware library :)
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = 
@@ -131,7 +132,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = ../../ $(SHARED)
+EXTRAINCDIRS = $(SHARED)
 
 
 # Compiler flag to set the C Standard level.
@@ -142,13 +143,9 @@ EXTRAINCDIRS = ../../ $(SHARED)
 CSTANDARD = -std=gnu99
 
 
-# Variable declarations
-MAX_EVENT_RECORDS = 4
-
-
 # Place -D or -U options here for C sources
 CDEFS = -DF_CPU=$(F_CPU)UL
-CDEFS += -DMAX_EVENT_RECORDS=$(MAX_EVENT_RECORDS)
+
 
 # Place -D or -U options here for ASM sources
 ADEFS = -DF_CPU=$(F_CPU)
@@ -295,8 +292,7 @@ LDFLAGS += $(LIBS)
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = stk500v2
-# -B 2
+AVRDUDE_PROGRAMMER = usbtiny -B 2
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = com6    # programmer connected to serial device
@@ -414,21 +410,11 @@ ALL_CPPFLAGS = -mmcu=$(MCU) -I. -x c++ $(CPPFLAGS) $(GENDEPFLAGS)
 ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 
-#export MCU
-#export F_CPU
-#export OPT
-#export EVENT_FREQ
-#export MAX_EVENT_RECORDS
-#export TWI_SPEED BAUD
-#include ../../libs/makefile
-
-
 # Default target.
 all: begin gccversion sizebefore build sizeafter end
 
 # Change the build target to build a HEX file or a library.
 build: elf hex eep lss sym
-#build: lib
 
 
 elf: $(TARGET).elf
@@ -436,8 +422,6 @@ hex: $(TARGET).hex
 eep: $(TARGET).eep
 lss: $(TARGET).lss
 sym: $(TARGET).sym
-LIBNAME=lib$(TARGET).a
-lib: $(LIBNAME)
 
 
 
@@ -480,11 +464,11 @@ program: $(TARGET).hex $(TARGET).eep
 
 # Write fuse values
 wfuses:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:$(L_FUSE):m -U hfuse:w:$(H_FUSE):m
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -U lfuse:w:$(L_FUSE):m -U hfuse:w:$(H_FUSE):m -U efuse:w:$(E_FUSE):m
 
 # Read fuse values
 rfuses:
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -U hfuse:r:.\high.txt:h -U lfuse:r:.\low.txt:h
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -U hfuse:r:.\high.txt:h -U lfuse:r:.\low.txt:h -U efuse:r:.\ext.txt:h
 
 
 # Generate avr-gdb config/init file which does the following:

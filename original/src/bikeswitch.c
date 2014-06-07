@@ -4,7 +4,7 @@
  * Created: 12/10/2011 1:02:19 PM
  *  Author: Matthew
  
-ATtiny85 - uC powered bicycle LED bicycle headlight.
+ATMega328p - uC powered bicycle LED bicycle headlight.
 - Uses SMPS theory to regulate current flow for high power LED.
 - Feedback system is an analog comparator, who's value is used to
 adjust the duty cycle used by the SMPS.
